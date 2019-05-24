@@ -40,7 +40,7 @@ global_logger(my_logger)
 
 You can also set `TBLogger` to be the current logger in a limited scope with the `with_logger` function:
 ```
-with_logger(my_logger) begin
+with_logger(my_logger) do
   # compute things
   @info .... # logged to TBLogger
 end
@@ -56,6 +56,7 @@ At the moment, we can serialize to the following TensorBoard backends (plugins):
   - *Scalar*        for real-valued data  (`log_value`)  
   - *Histograms*    for real-value histograms (`log_histogram` and `log_vector`)
   - *Text*          for markdown (`log_text`)
+  - *Image*         for images (`log_image`). Note: you will need either ImageMagick.jl or QuartzImageIO.jl installed in the current enviroment for Image logging to function.
 
 When you use the Logging interface we break down structures in order to obtain types that 
 can be serialized to one of those backends. In particoular, the behaviour is the following:
@@ -76,7 +77,7 @@ For example, the following code
 ```
 struct Test a; b; end
 data = Test(Complex(1,2), rand(10,10))
-with_logger(TBLogger("example")) begin
+with_logger(TBLogger("example")) do
   @info "ex" data
 end
 ```
