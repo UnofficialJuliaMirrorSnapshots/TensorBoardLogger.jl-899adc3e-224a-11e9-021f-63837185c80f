@@ -38,6 +38,15 @@ See also: [`Base.propertynames`](@ref)
 """
 logable_propertynames(val::Any) = propertynames(val)
 
+## Default unpacking of key-value dictionaries
+function preprocess(name, dict::AbstractDict, data)
+    for (key, val) in dict
+        # convert any key into a string, via interpolating it
+        preprocess("$name/$key", val, data)
+    end
+    return data
+end
+
 ## Default behaviours
 
 ########## For things going to LogImage ##############################
@@ -49,15 +58,15 @@ function preprocess(name,   img::AbstractArray{<:Colorant}, data)
         #3rd is channel dim as observed in testimages
         channels = size(img, 3)
         for c in 1:channels
-            preprocess(name, convert(PNG, img[:, :, c]), data)
+            preprocess(name, convert(PngImage, img[:, :, c]), data)
         end
     else
-        preprocess(name, convert(PNG, img), data)
+        preprocess(name, convert(PngImage, img), data)
     end
     return data
 end
-preprocess(name, val::PNG, data) = push!(data, name=>val)
-summary_impl(name, value::PNG) = image_summary(name, value)
+preprocess(name, val::PngImage, data) = push!(data, name=>val)
+summary_impl(name, value::PngImage) = image_summary(name, value)
 
 
 ########## For things going to LogText ##############################
